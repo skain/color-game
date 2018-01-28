@@ -13,7 +13,6 @@ export default class ColorBlock {
     }
 
     getBlockCSSClass() {
-        console.log(this);
         return {
             'grid-block': true,
             'selected': this.selected
@@ -22,7 +21,6 @@ export default class ColorBlock {
 
     getBlockInlineStyle(blockSize) {
         let bpx = blockSize + 'px';
-        console.log(bpx);
         return {
             'background-color': this.getRGBString(),
             'height': bpx,

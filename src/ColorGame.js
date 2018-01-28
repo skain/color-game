@@ -7,6 +7,7 @@ export default class ColorGame {
     constructor(gridSize) {
         this.gridManager = new GridManager(gridSize);
         this.gameStarted = false;
+        this.debug = false;
     }
 
     startGame() {

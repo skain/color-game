@@ -8,12 +8,14 @@ export default class GridManager {
         this.gameGrid = [];
         this.numBlocks = this.gridSize * this.gridSize;
         this.isShuffled = false;
+        this.puzzleComplete = false;
     }
 
     setNewGrid() {
         this.isShuffled = false;
         let generator = new GridGenerator(this.gridSize);
         this.gameGrid = generator.generateGrid();
+        this.puzzleComplete = false;
     }
 
     shuffle() {
@@ -42,6 +44,7 @@ export default class GridManager {
                 curRow.push(block);
             }
             shuffledGrid.push(curRow);
+            this.puzzleComplete = false;
         }
 
         this.gameGrid = shuffledGrid;
@@ -77,12 +80,12 @@ export default class GridManager {
             for (let col = 0; col < this.gridSize; col++) {
                 let block = this.gameGrid[row][col];
                 if (block.currentX !== block.properX || block.currentY !== block.currentY) {
-                    return false;
+                    return;
                 }
             }
         }
 
-        return true;
+        this.puzzleComplete = true;
     }
 }
 

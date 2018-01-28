@@ -8,6 +8,7 @@
           <p class='pure-u-1-1'>
               <button class='pure-button' v-on:click='newGameClicked'>New Game</button>
               <button class='pure-button' v-on:click='shuffleClicked' v-bind:disabled='shuffleDisabled'>Shuffle</button>
+              <button class='pure-button' v-on:click='debugClicked'>Debug</button>
           </p>
       </div>
   </div>
@@ -17,7 +18,7 @@
 import ColorGame from './ColorGame';
 import GameGrid from './components/GameGrid.vue';
 
-const colorGame = new ColorGame(5);
+const colorGame = new ColorGame(4);
 colorGame.startGame();
 
 export default {
@@ -36,6 +37,9 @@ export default {
         },
         shuffleClicked() {
             this.game.shuffle();
+        },
+        debugClicked() {
+            this.game.debug = !this.game.debug;
         }
     },
     computed: {

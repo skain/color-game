@@ -2,11 +2,13 @@
     <div>
         <div id='game-grid' v-bind:style='{"width": width}'>
             <div class='grid-row' v-for='row in game.gridManager.gameGrid'>
-                <grid-block v-for='block in row' v-on:blockClicked='blockClicked(block)' v-bind:block='block' v-bind:blockSize='blockSize' v-bind:blockSelected='block.isSelected'>
+                <grid-block v-for='block in row' v-on:blockClicked='blockClicked(block)'
+                    v-bind:block='block' v-bind:blockSize='blockSize'
+                    v-bind:debug='game.debug' v-bind:blockSelected='block.isSelected'>
                 </grid-block>
             </div>
         </div>
-        <h2 v-if='puzzleComplete'>You got it!</h2>
+        <h2 v-if='game.gridManager.puzzleComplete'>You got it!</h2>
     </div>
 </template>
 
@@ -34,7 +36,7 @@ export default {
         blockClicked(block) {
             this.game.gridManager.handleBlockClick(block);
             if (this.game.gridManager.checkSolution()) {
-
+                this.puzzleComplete = true;
             }
         },
         getBlockInlineStyle(block) {

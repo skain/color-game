@@ -1,9 +1,11 @@
 <template>
     <div v-bind:class='cssClassObject' v-on:click='blockClicked(block)' v-bind:style="block.getBlockInlineStyle(blockSize)">
         <div class='inner-grid-block' v-bind:style="block.getBlockInlineStyle(blockSize)">
-            {{block.properX + ', ' + block.properY }}
-            <br />
-            {{block.currentX + ', ' + block.currentY }}
+            <div v-if='debug'>
+                {{block.properX + ', ' + block.properY }}
+                <br />
+                {{block.currentX + ', ' + block.currentY }}
+            </div>
         </div>
     </div>
 </template>
@@ -18,7 +20,7 @@ export default {
         return {
         };
     },
-    props: ['block', 'blockSize'],
+    props: ['block', 'blockSize', 'debug'],
     methods: {
         blockClicked() {
             this.$emit('blockClicked', this.block);
