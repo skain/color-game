@@ -6,6 +6,7 @@ export default class ColorBlock {
         this.properX = this.properY = null;
         this.currentX = this.currentY = null;
         this.isSelected = false;
+        this.isAnchor = false;
     }
 
     getRGBString() {
@@ -20,6 +21,10 @@ export default class ColorBlock {
     }
 
     getBlockInlineStyle(blockSize) {
+        if (this.selected) {
+            blockSize = blockSize * 1.2;
+        }
+        
         let bpx = blockSize + 'px';
         return {
             'background-color': this.getRGBString(),
@@ -44,5 +49,9 @@ export default class ColorBlock {
 
     setSelected(value) {
         this.isSelected = value;
+    }
+
+    setIsAnchor(value) {
+        this.isAnchor = value;
     }
 }

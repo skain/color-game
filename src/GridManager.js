@@ -9,6 +9,7 @@ export default class GridManager {
         this.numBlocks = this.gridSize * this.gridSize;
         this.isShuffled = false;
         this.puzzleComplete = false;
+        this.anchorCoords = null;
     }
 
     setNewGrid() {
@@ -16,6 +17,15 @@ export default class GridManager {
         let generator = new GridGenerator(this.gridSize);
         this.gameGrid = generator.generateGrid();
         this.puzzleComplete = false;
+        this.setAnchors();
+    }
+
+    setAnchors() {
+        let stratBuilder = new AnchorStrategyBuilder(this.gridSize);
+        this.anchorCoords = stratBuilder.getRandomAnchorCoords();
+        this.anchorCoords.forEach(anchor => {
+            this.gameGrid[anchor.x][anchor.y].setIsAnchor(true);
+        });
     }
 
     shuffle() {
@@ -32,6 +42,12 @@ export default class GridManager {
         }
         let shuffledGridRange = MathUtils.shuffleArray(gridRange);
         let shuffledGrid = [];
+
+        let anchorCoordsLookup = [];
+        this.anchorCoords.forEach(anchor => {
+            anchorCoordsLookup.push(anchor.x + ',' + anchor.y);
+        });
+
         for (let row = 0; row < this.gridSize; row++) {
             let curRow = [];
             for (let col = 0; col < this.gridSize; col++) {
@@ -39,8 +55,13 @@ export default class GridManager {
                 let shuffledValue = shuffledGridRange[shuffledIndex];
                 let origRow = shuffledValue % this.gridSize;
                 let origCol = Math.floor(shuffledValue / this.gridSize);
-                let block = this.gameGrid[origRow][origCol];
-                block.setCurrentCoordinates(row, col);
+                let block = null;
+                if (anchorCoordsLookup.includes(row + ',' + col) || anchorCoordsLookup.includes(origRow + ',' + origCol)) {
+                    block = this.gameGrid[row][col];
+                } else {
+                    block = this.gameGrid[origRow][origCol];
+                    block.setCurrentCoordinates(row, col);
+                }
                 curRow.push(block);
             }
             shuffledGrid.push(curRow);
@@ -52,9 +73,10 @@ export default class GridManager {
     }
 
     handleBlockClick(clickedBlock) {
-        if (!this.isShuffled) {
+        if (!this.isShuffled || clickedBlock.isAnchor) {
             return;
         }
+
 
         if (this.selectedBlock) {
             if (clickedBlock !== this.selectedBlock) {
@@ -86,6 +108,57 @@ export default class GridManager {
         }
 
         this.puzzleComplete = true;
+    }
+}
+
+class AnchorStrategyBuilder {
+    constructor(gridSize) {
+        this.gridSize = gridSize;
+        this.strategies = [
+            this.getFourCorners,
+            this.getTopBottom,
+            this.getTwoSides
+        ];
+    }
+
+    getFourCorners(gridSize) {
+        let max = gridSize - 1;
+        return [
+            {x: 0, y: 0},
+            {x: 0, y: max},
+            {x: max, y: 0},
+            {x: max, y: max}
+        ];
+    }
+
+    getTopBottom(gridSize) {
+        let max = gridSize - 1;
+        let coords = [];
+
+        for (let i = 0; i < gridSize; i++) {
+            coords.push({x: 0, y: i});
+            coords.push({x: max, y: i});
+        }
+
+        return coords;
+    }
+
+    getTwoSides(gridSize) {
+        let max = gridSize - 1;
+        let coords = [];
+
+        for (let i = 0; i < gridSize; i++) {
+            coords.push({x: i, y: 0});
+            coords.push({x: i, y: max});
+        }
+
+        return coords;
+    }
+
+    getRandomAnchorCoords() {
+        let rnd = MathUtils.getRandomInt(0, this.strategies.length);
+        let coords = this.strategies[rnd](this.gridSize);
+        return coords;
     }
 }
 
