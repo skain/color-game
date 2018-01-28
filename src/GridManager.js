@@ -37,7 +37,9 @@ export default class GridManager {
                 let shuffledValue = shuffledGridRange[shuffledIndex];
                 let origRow = shuffledValue % this.gridSize;
                 let origCol = Math.floor(shuffledValue / this.gridSize);
-                curRow.push(this.gameGrid[origRow][origCol]);
+                let block = this.gameGrid[origRow][origCol];
+                block.setCurrentCoordinates(row, col);
+                curRow.push(block);
             }
             shuffledGrid.push(curRow);
         }
@@ -46,14 +48,42 @@ export default class GridManager {
         this.isShuffled = true;
     }
 
-    handleBlockClick(block) {
+    handleBlockClick(clickedBlock) {
         if (!this.isShuffled) {
             return;
         }
-        block.setSelected(true);
+
+        if (this.selectedBlock) {
+            if (clickedBlock !== this.selectedBlock) {
+                let clickedX = clickedBlock.currentX;
+                let clickedY = clickedBlock.currentY;
+
+                this.gameGrid[this.selectedBlock.currentX][this.selectedBlock.currentY] = clickedBlock;
+                clickedBlock.setCurrentCoordinates(this.selectedBlock.currentX, this.selectedBlock.currentY);
+                this.gameGrid[clickedX][clickedY] = this.selectedBlock;
+                this.selectedBlock.setCurrentCoordinates(clickedX, clickedY);
+            }
+            this.selectedBlock.setSelected(false);
+            this.selectedBlock = null;
+            clickedBlock.setSelected(false);
+        } else {
+            this.selectedBlock = clickedBlock;
+            clickedBlock.setSelected(true);
+        }
     }
 
+    checkSolution() {
+        for (let row = 0; row < this.gridSize; row++) {
+            for (let col = 0; col < this.gridSize; col++) {
+                let block = this.gameGrid[row][col];
+                if (block.currentX !== block.properX || block.currentY !== block.currentY) {
+                    return false;
+                }
+            }
+        }
 
+        return true;
+    }
 }
 
 class GridGenerator {
@@ -73,6 +103,7 @@ class GridGenerator {
             let curRow = this.generateGradientStrip(firstCol[row].color, lastCol[row].color);
             curRow.forEach((block, col) => {
                 block.setProperCoordinates(col, row);
+                block.setCurrentCoordinates(col, row);
             });
             gameGrid.push(curRow);
         }

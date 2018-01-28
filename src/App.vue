@@ -17,7 +17,7 @@
 import ColorGame from './ColorGame';
 import GameGrid from './components/GameGrid.vue';
 
-const colorGame = new ColorGame(10);
+const colorGame = new ColorGame(5);
 colorGame.startGame();
 
 export default {

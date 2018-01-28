@@ -1,9 +1,10 @@
 import Color from './Color';
 
 export default class ColorBlock {
-    constructor(color, properX, properY) {
+    constructor(color) {
         this.color = color;
-        this.setProperCoordinates(properX, properY);
+        this.properX = this.properY = null;
+        this.currentX = this.currentY = null;
         this.isSelected = false;
     }
 
@@ -19,9 +20,13 @@ export default class ColorBlock {
         };
     }
 
-    getBlockInlineStyle() {
+    getBlockInlineStyle(blockSize) {
+        let bpx = blockSize + 'px';
+        console.log(bpx);
         return {
             'background-color': this.getRGBString(),
+            'height': bpx,
+            'width': bpx
         };
     }
 
@@ -32,6 +37,11 @@ export default class ColorBlock {
     setProperCoordinates(x, y) {
         this.properX = x;
         this.properY = y;
+    }
+
+    setCurrentCoordinates(x, y) {
+        this.currentX = x;
+        this.currentY = y;
     }
 
     setSelected(value) {
