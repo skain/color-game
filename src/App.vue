@@ -19,6 +19,7 @@ import ColorGame from './ColorGame';
 import GameGrid from './components/GameGrid.vue';
 
 const colorGame = new ColorGame(10);
+window.colorGame = colorGame;
 colorGame.startGame();
 
 export default {
@@ -53,5 +54,9 @@ export default {
 <style>
     #app {
         margin: 0px 10px 10px 20px;
+    }
+
+    h1 {
+        color: rgb(245,245,245);
     }
 </style>

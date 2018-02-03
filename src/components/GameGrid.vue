@@ -26,7 +26,6 @@ export default {
     },
     data () {
         return {
-            puzzleComplete: false,
             width: Math.floor((this.game.gridManager.gridSize * BLOCK_SIZE) * 1.1) - 1 + 'px',
             blockSize: BLOCK_SIZE
         };
@@ -35,16 +34,12 @@ export default {
     methods: {
         blockClicked(block) {
             this.game.gridManager.handleBlockClick(block);
-            if (this.game.gridManager.checkSolution()) {
-                this.puzzleComplete = true;
-            }
         },
         getBlockInlineStyle(block) {
             return block.getBlockInlineStyle();
         }
     },
     computed: {
-
     }
 };
 </script>

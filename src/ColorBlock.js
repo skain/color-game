@@ -24,7 +24,7 @@ export default class ColorBlock {
         if (this.selected) {
             blockSize = blockSize * 1.2;
         }
-        
+
         let bpx = blockSize + 'px';
         return {
             'background-color': this.getRGBString(),
@@ -33,8 +33,8 @@ export default class ColorBlock {
         };
     }
 
-    isCoordinateMatch(checkX, checkY) {
-        return checkX == this.properX && checkY == this.properY;
+    isCurrentPositionCorrect() {
+        return this.currentX == this.properX && this.currentY == this.properY;
     }
 
     setProperCoordinates(x, y) {
@@ -49,6 +49,7 @@ export default class ColorBlock {
 
     setSelected(value) {
         this.isSelected = value;
+
     }
 
     setIsAnchor(value) {

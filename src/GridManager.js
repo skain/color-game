@@ -10,6 +10,7 @@ export default class GridManager {
         this.isShuffled = false;
         this.puzzleComplete = false;
         this.anchorCoords = null;
+        this.selectedBlock = null;
     }
 
     setNewGrid() {
@@ -17,6 +18,7 @@ export default class GridManager {
         let generator = new GridGenerator(this.gridSize);
         this.gameGrid = generator.generateGrid();
         this.puzzleComplete = false;
+        this.selectedBlock = null;
         this.setAnchors();
     }
 
@@ -29,43 +31,57 @@ export default class GridManager {
     }
 
     shuffle() {
-        /**
-        This is pretty crazy so I'll explain. My thinking here was to create a range representing each block in the original grid.
-        I then shuffle this range to get a randomized list of indexes into a single-dimensional array of blocks.
-        It gets complicated because I actually store the blocks in a 2-dimensional array so I use modulus and division to convert back and forth between the two.
-
-        Pretty sure there's a better way but since I was just kind of improvising and figuring out what I even wanted as I went it's ok for now...
-        **/
-        let gridRange = [];
-        for (let i = 0; i < this.numBlocks; i++) {
-            gridRange.push(i);
-        }
-        let shuffledGridRange = MathUtils.shuffleArray(gridRange);
-        let shuffledGrid = [];
-
         let anchorCoordsLookup = [];
         this.anchorCoords.forEach(anchor => {
             anchorCoordsLookup.push(anchor.x + ',' + anchor.y);
         });
 
+        let coordsWithoutAnchors = [];
         for (let row = 0; row < this.gridSize; row++) {
-            let curRow = [];
             for (let col = 0; col < this.gridSize; col++) {
-                let shuffledIndex = (row * this.gridSize) + col;
-                let shuffledValue = shuffledGridRange[shuffledIndex];
-                let origRow = shuffledValue % this.gridSize;
-                let origCol = Math.floor(shuffledValue / this.gridSize);
-                let block = null;
-                if (anchorCoordsLookup.includes(row + ',' + col) || anchorCoordsLookup.includes(origRow + ',' + origCol)) {
-                    block = this.gameGrid[row][col];
-                } else {
-                    block = this.gameGrid[origRow][origCol];
-                    block.setCurrentCoordinates(row, col);
+                if (!anchorCoordsLookup.includes(row + ',' + col)) {
+                    coordsWithoutAnchors.push({x: row, y: col});
                 }
-                curRow.push(block);
             }
-            shuffledGrid.push(curRow);
-            this.puzzleComplete = false;
+        }
+
+        let shuffledCoordsWithoutAnchors = [];
+
+        let shuffleIterations = 0;
+        let shuffledGrid = null;
+        while(true){
+            shuffleIterations++;
+            coordsWithoutAnchors = [];
+            for (let row = 0; row < this.gridSize; row++) {
+                for (let col = 0; col < this.gridSize; col++) {
+                    if (!anchorCoordsLookup.includes(row + ',' + col)) {
+                        coordsWithoutAnchors.push({x: row, y: col});
+                    }
+                }
+            }
+            shuffledCoordsWithoutAnchors = MathUtils.shuffleArray(coordsWithoutAnchors);
+            shuffledGrid = [];
+
+            for (let row = 0; row < this.gridSize; row++) {
+                let curRow = [];
+                for (let col = 0; col < this.gridSize; col++) {
+                    let block = null;
+                    if (anchorCoordsLookup.includes(row + ',' + col)) {
+                        block = this.gameGrid[row][col];
+                    } else {
+                        let coord = shuffledCoordsWithoutAnchors.pop();
+                        block = this.gameGrid[coord.x][coord.y];
+                        block.setCurrentCoordinates(col, row);
+                    }
+                    curRow.push(block);
+                }
+                shuffledGrid.push(curRow);
+            }
+
+
+            if (!this.isPuzzleComplete(shuffledGrid)) {
+                break;
+            }
         }
 
         this.gameGrid = shuffledGrid;
@@ -73,20 +89,24 @@ export default class GridManager {
     }
 
     handleBlockClick(clickedBlock) {
-        if (!this.isShuffled || clickedBlock.isAnchor) {
+        if (!this.isShuffled || clickedBlock.isAnchor || this.puzzleComplete) {
             return;
         }
 
-
-        if (this.selectedBlock) {
+        // debugger;
+        if (this.selectedBlock !== null) {
             if (clickedBlock !== this.selectedBlock) {
                 let clickedX = clickedBlock.currentX;
                 let clickedY = clickedBlock.currentY;
 
-                this.gameGrid[this.selectedBlock.currentX][this.selectedBlock.currentY] = clickedBlock;
+                //set the previously selected block location to the clicked block
+                this.gameGrid[this.selectedBlock.currentY][this.selectedBlock.currentX] = clickedBlock;
                 clickedBlock.setCurrentCoordinates(this.selectedBlock.currentX, this.selectedBlock.currentY);
-                this.gameGrid[clickedX][clickedY] = this.selectedBlock;
+
+                //set the clicked block location to the previously selected block
+                this.gameGrid[clickedY][clickedX] = this.selectedBlock;
                 this.selectedBlock.setCurrentCoordinates(clickedX, clickedY);
+                this.checkSolution();
             }
             this.selectedBlock.setSelected(false);
             this.selectedBlock = null;
@@ -97,17 +117,21 @@ export default class GridManager {
         }
     }
 
-    checkSolution() {
+    isPuzzleComplete(gameGrid) {
         for (let row = 0; row < this.gridSize; row++) {
             for (let col = 0; col < this.gridSize; col++) {
-                let block = this.gameGrid[row][col];
-                if (block.currentX !== block.properX || block.currentY !== block.currentY) {
-                    return;
+                let block = gameGrid[row][col];
+                if (!block.isCurrentPositionCorrect()) {
+                    return false;
                 }
             }
         }
 
-        this.puzzleComplete = true;
+        return true;
+    }
+
+    checkSolution() {
+        this.puzzleComplete = this.isPuzzleComplete(this.gameGrid);
     }
 }
 

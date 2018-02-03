@@ -18,6 +18,7 @@ export default {
     },
     data () {
         return {
+            border: 5
         };
     },
     props: ['block', 'blockSize', 'debug'],
@@ -68,9 +69,13 @@ export default {
     }
 
     .inner-grid-block.anchor {
-        border: solid 1px white;
-        height: 95%;
-        width: 95%;
+        border: solid 2px white;
+        background-color: black;
+        height: 5%;
+        width: 5%;
+        position: relative;
+        top: 45%;
+        left: 45%;
     }
 
     .grid-block.selected .inner-grid-block{
