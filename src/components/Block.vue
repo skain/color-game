@@ -69,7 +69,7 @@ export default {
     }
 
     .inner-grid-block.anchor {
-        border: solid 2px white;
+        border: solid 2px rgb(240,240,240);
         background-color: black;
         height: 5%;
         width: 5%;
