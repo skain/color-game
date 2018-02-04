@@ -8,7 +8,9 @@
                 </grid-block>
             </div>
         </div>
-        <h2 v-if='game.gridManager.puzzleComplete'>You got it!</h2>
+        <h2 v-if='showIntro()'>Ooh, so pretty! You <i>shuffle</i>?</h2>
+        <h2 v-if='showShuffle()'>Oh noooo! <i>Fix it</i>!</h2>
+        <h2 v-if='showComplete()'>You got it!</h2>
     </div>
 </template>
 
@@ -37,6 +39,15 @@ export default {
         },
         getBlockInlineStyle(block) {
             return block.getBlockInlineStyle();
+        },
+        showIntro() {
+            return this.game.gameStarted && !this.game.gridManager.isShuffled;
+        },
+        showShuffle() {
+            return this.game.gameStarted && this.game.gridManager.isShuffled && !this.game.gridManager.puzzleComplete;
+        },
+        showComplete() {
+            return this.game.gridManager.puzzleComplete;
         }
     },
     computed: {
@@ -45,5 +56,12 @@ export default {
 </script>
 
 <style scoped>
+    #game-grid {
+        display: inline-block;
+    }
 
+    h2 {
+        display: inline-block;
+        vertical-align: top;
+    }
 </style>

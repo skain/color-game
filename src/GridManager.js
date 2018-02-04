@@ -122,6 +122,7 @@ export default class GridManager {
             for (let col = 0; col < this.gridSize; col++) {
                 let block = gameGrid[row][col];
                 if (!block.isCurrentPositionCorrect()) {
+                    console.log({blockOutOfPosition: block});
                     return false;
                 }
             }

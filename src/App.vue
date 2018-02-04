@@ -56,7 +56,7 @@ export default {
         margin: 0px 10px 10px 20px;
     }
 
-    h1 {
+    h1, h2 {
         color: rgb(245,245,245);
     }
 </style>
